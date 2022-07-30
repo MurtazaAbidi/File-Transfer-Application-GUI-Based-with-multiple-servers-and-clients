@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTP Project</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+    <script src="eel.js"></script>
+    <script>
+        function connectServer(){
+                eel.conn();
+            // }else{
+            //     alert("Connection unsucessful. Make sure the server is online. ");
+            // }
+        }
+        function mainpage(){
+            var div = document.getElementById("mid");
+            div.innerHTML = '<div class="dropdown"><label for="choice">Choose any Option:</label><select name="choice" id="choice"><option value="upload">Upload a file</option><option value="download">Download a file</option><option value="delete">Delete a file</option><option value="list">List all files</option></select></div><button class= "btn" onclick="perform()">Ok </button><button class= "btn" onclick="quit()">Quit </button>'
+        }
+        
+        function quit(){
+            eel.quit();
+            alert ('Quit Connection Successfully !!')
+
+        }
+        function showText(text){
+            alert (text);
+            mainpage();   
+        }
+        eel.expose(showText);
+        
+        function onServer(){
+            alert('Connection unsucessful. Make sure the server is online.')
+        }
+        eel.expose(onServer);
+        
+        function perform(){
+            var e = document.getElementById("choice");
+            // alert(e.value);
+            choice = e.value;
+            var mid = document.getElementById("mid")
+            if (e.value == "upload"){
+                mid.innerHTML = '<div> Choose a file to Upload<input class="dropdown" type="file" id="file" name="file" multiple></div><button class="btn" onclick="upload()">upload</button><button style="position: relative; left: 10rem; top: 12rem ;" class = "btn" onclick="mainpage()">back</button>'
+            }else if (e.value == "download") {
+                downloading_file();
+                
+            }else if (e.value == "delete"){
+                deleting_file();                
+                
+            }else if (e.value == "list"){
+                mid.innerHTML = '<div> List of Files Currently at server: <button style="width: 223px;" class="btn" onclick="list()">Press to See List</button>'
+                
+            }
+        }
+
+        function upload(){
+            var uploadedFile = document.getElementById("file").value;
+            temp = uploadedFile.split('fakepath\\')
+            uploaded = 'D:\\filepath\\'+temp[1];
+            // alert(uploaded);
+            eel.upld(uploaded);
+        }
+        function file_successfully_uploaded(filename, upload_time, upload_size){
+            alert('file successfully uploaded !!\nSent file: '+filename+'\nTime elapsed: '+upload_time+'s\nFile size: '+upload_size+'b')
+            mainpage();        
+        }
+        eel.expose(file_successfully_uploaded);
+        function file_not_uploaded(){
+            alert("Couldn't open file. Make sure the file path is correct (i.e. D:\\filepath\\). !!");
+            mainpage();
+        }
+        eel.expose(file_not_uploaded);
+
+        function list(){
+            eel.list_files("list");
+            alert(fname)
+            innertext = document.getElementById('mid');
+            innertext.innerHTML += '<button style="position: relative; left: 10rem; top: 10rem ;" class = "btn" onclick="mainpage()">back</button>'
+        }
+
+        function showlist(filenames, filesize, total_directory_size){
+            // alert(filenames);
+            // alert(filesize);
+            // alert(total_directory_size);
+            let text = "";
+            innertext = document.getElementById('mid');
+            for (let i = 0; i < filenames.length; i++) {
+                text += filenames[i] + " - "+filesize[i]+"b<br>";
+            }
+            text += "<br>Total Directory Size: "+total_directory_size+"b<br>";
+            innertext.innerHTML = "List of Files Currently at server:<br><br>"+text;
+            innertext.innerHTML += '<button style="position: relative; left: 17rem; top: 5rem ;" class = "btn" onclick="mainpage()">back</button>'
+        }
+        eel.expose(showlist);
+
+        function delete_file(list_filename){
+            innertext = document.getElementById('mid');
+            text = ""
+            text = '<div class="dropdown"><label for="choice">Choose any Option:</label><select name="delete" id="delete">'
+            for(let i = 0; i< list_filename.length; i++){
+                text += '<option >'+ list_filename[i] +'</option>';
+            }
+            text += '</select></div><button class= "btn" onclick="deleting_from_server()">delete </button></div><button style="position: relative; left: 10rem; top: 12rem ;" class = "btn" onclick="mainpage()">back</button>';
+            innertext.innerHTML = text
+            // alert(innertext.innerHTML)
+
+        }
+        eel.expose(delete_file);
+
+        function deleting_from_server(){
+            filename = document.getElementById('delete').value;
+            alert(filename)
+            eel.delf(filename);
+        }
+
+        function deleting_file (){
+            eel.list_files("delete");
+        }
+
+        // function file_deleted(status){
+        //     if (status == "1")
+        //         alert('File successfully deleted');
+        //     else
+        //     alert('The file does not exist on server')
+        //     mainpage();
+        // }
+        // eel.expose(file_deleted)
+
+        function downloading_file (){
+            eel.list_files("download")
+        }
+
+        function download_file (filenames){
+            innertext = document.getElementById('mid');
+            let text = ""
+            text = '<div class="dropdown"><label for="choice">Choose any Option:</label><select name="download" id="download">'
+            for(let i = 0; i< filenames.length; i++){
+                text += '<option >'+ filenames[i] +'</option>';
+            }
+            text += '</select></div><button class= "btn" onclick="downloading_from_server()">Download </button></div><button style="position: relative; left: 10rem; top: 12rem ;" class = "btn" onclick="mainpage()">back</button>';
+            innertext.innerHTML = text
+            // alert(innertext.innerHTML)
+
+        }
+        eel.expose(download_file)
+
+        function downloading_from_server(){
+            filename = document.getElementById('download').value;
+            eel.dwld(filename);
+        }
+        
+
+
+        </script>
+</head>
+<body>
+    <div class="heading">File Transfer Application </div>
+    <div class="mid" id="mid" > 
+        <div class="dropdown">
+            Click to Connect to server
+        </div>
+        <button class= "btn" onclick="connectServer()">Connect</button>
+    </div>
+    </div>
+</body>
+</html>
